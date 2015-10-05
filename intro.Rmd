@@ -1,0 +1,61 @@
+---
+title: "Arbeta med data i R genom dplyr"
+author: "Johan Junkka"
+date: "September 29, 2015"
+output: 
+  revealjs::revealjs_presentation:
+    transition: slide
+---
+
+
+# Hur du hittar hjälp
+
+* Använd vignettes `vignette(package = "survival")`
+* Lär dig använda Rs interna hjälp 
+    * Vad är hjälpfilen för att göra en plot av coxreg - `?plot.coxreg`
+    * Structur på hjälp `METHOD.CLASS`
+
+# Mer hjälp
+
+* Sök inte bara efter svar utan våga **fråga** på [Stackoverflow](http://stackoverflow.com/) & [Cross Validated](http://stats.stackexchange.com/)
+* Kolla på andra människors kod, på [GitHub](https://github.com/ropensci) eller "replicable articles" på [Demographic Research](http://demographic-research.org/volumes/replicable_articles.htm)
+* Sök GitHub efter exempel [ghelp()](https://gist.github.com/hrbrmstr/32e9c140129d7d51db52) 
+
+# The haleyverse
+
+
+
+## dplyr
+
+När man arbetar med data måste man:
+
+* Komma på vad man vill göra
+* Beskriva vad man vill göra i form av ett dator progrma
+* Utföra det
+
+```{r}
+library(dplyr)
+```
+
+----
+
+## Prossessen - samlat i ett dokument
+
+Research question -> collect data -> data manipulation -> analysis -> report
+
+----
+
+dplyr paketet gör dessa steg så enkla och snabba som möjligt genom att koppla ihop tänkandet till koden.
+
+
+* Elucidating the most common data manipulation operations, so that your options are helpfully constrained when thinking about how to tackle a problem.
+* Providing simple functions that correspond to the most common data manipulation verbs, so that you can easily translate your thoughts into code.
+
+## tidyr
+
+What is tidy data?
+
+## Helper packages
+
+stringr
+
