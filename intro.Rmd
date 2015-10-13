@@ -4,9 +4,35 @@ author: "Johan Junkka"
 date: "September 29, 2015"
 output: 
   revealjs::revealjs_presentation:
+    theme: white
+    highlight: zenburn
     transition: slide
 ---
 
+# Material
+
+[http://bit.ly/1NmeMMu](https://dl.dropboxusercontent.com/u/12260536/ddb_course/intro.html#/)
+
+Live script: [http://bit.ly/1FSZSuu](http://bit.ly/1FSZSuu)
+
+# Inför lektionen
+
+Under denna lektion kommer vi att arbeta med 2 paket:
+
+* dplyr - data hantering
+* tidyr - städa data
+
+```r
+# install.packages(c("dplyr", "tidyr"))
+```
+
+Förutom dessa kommer vi också att bekanta oss med
+
+* stringr - arbeta med text strängar
+* ggplot2 - visualiser
+* test_that - automatiska testa 
+
+Installera gärna dessa paket, inför lektionen.
 
 # Hur du hittar hjälp
 
@@ -23,7 +49,11 @@ output:
 
 # The haleyverse
 
+![haley_verse](http://adolfoalvarez.cl/images/hadleyverse.png)
 
+[The Hitchhiker's Guide to the Hadleyverse](http://adolfoalvarez.cl/the-hitchhikers-guide-to-the-hadleyverse/)
+
+---
 
 ## dplyr
 
@@ -51,11 +81,80 @@ dplyr paketet gör dessa steg så enkla och snabba som möjligt genom att koppla
 * Elucidating the most common data manipulation operations, so that your options are helpfully constrained when thinking about how to tackle a problem.
 * Providing simple functions that correspond to the most common data manipulation verbs, so that you can easily translate your thoughts into code.
 
+--- 
+
+## Basic data manipulation
+
+* filter
+* arrange
+* group_by
+* summarise
+* mutate
+* join
+
+---
+
 ## tidyr
 
-What is tidy data?
+Vad ärs städat data?
+
+* Varje kolumn är en variable
+* Varje rad är en observation
+
+Enkelt att transformer, visualisera och modellera
+
+---
+
+```{r}
+library(dplyr)
+library(tidyr)
+```
+
+---
+
+```{r}
+dirty_data <- data_frame(
+  context = c("Skellefteå", "Skellefteå lands", "Bureå", "Jörn"),
+  year.1.men = rpois(4,1000),
+  year.1.women = rpois(4,1000),
+  year.2.men = rpois(4,1200),
+  year.2.women = rpois(4,1200)
+)
+
+dirty_data
+```
+
+---
+
+```{r}
+tidy_data <- dirty_data %>% gather(key, population, year.1.men:year.2.women)
+tidy_data
+```
+
+---
+
+```{r}
+tidy_data <- dirty_data %>% gather(key, population, year.1.men:year.2.women) %>% 
+  separate(key, c("key", "year", "gender"))
+tidy_data %>% arrange(context)
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(tidy_data, aes(year, population, group = gender, color = gender)) + geom_line() + facet_wrap(~context)
+```
+
+
+---
 
 ## Helper packages
 
-stringr
+stringr & regEX
+
+```{r}
+library(stringr)
+x = "år1890"
+str_extract(x, "[0-9]{4}$")
+```
 

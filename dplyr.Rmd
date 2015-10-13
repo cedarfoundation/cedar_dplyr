@@ -1,0 +1,192 @@
+---
+title: "dplyr_tutorial"
+author: "Johan Junkka"
+date: "October 5, 2015"
+output: html_document
+---
+
+# Dplyr
+
+```{r}
+
+library(dplyr)
+
+# ladda skel 15 för att komma åt data ()
+# install.packages("http://capa.ddb.umu.se/cedar15/Data/skel15_0.4.tar.gz", repos = NULL, type = "source")
+library(skel15)
+```
+
+```{r}
+data(package = "skel15")
+```
+
+Vad har vi för data att arbeta med?
+
+Två dataset
+
+Data sets in package ‘skel15’:
+
+obs                                Event histories
+person                             Person
+
+## Titta på data
+
+Om vi vill titta på dataset "person" kommer alla variabler att skrivas ut i consollen. För att undvika detta kan vi byta class på objektet person till tbl_df
+
+```{r}
+person <- tbl_df(person)
+```
+
+```{r}
+obs <- tbl_df(obs)
+```
+
+Nu skrivs endast de första 10 raderna ut. 
+
+## Filter
+
+Låt oss endast titta på kvinnor födda efter 1800
+
+```{r}
+filter(person, KON == 2, FODDAT %/% 10000 > 1800)
+```
+
+## Arrangerar
+
+
+arrangerade efter födelsedatum 
+
+
+```{r}
+arrange(person, FODDAT)
+```
+
+arrangerade i descending order efter födelsedatum
+
+```{r}
+arrange(select(person, ID, KON, FODDAT), desc(FODDAT))
+```
+
+
+Använda pipes `%>%`
+
+data %>% select %>% arrange
+
+```{r}
+person %>% 
+  select(ID, KON, FODDAT) %>% 
+  arrange(desc(FODDAT))
+```
+
+Hur många unika individer finns i observations datat?
+
+```{r}
+n_obs <- obs %>% select(id) %>% distinct() %>% nrow()
+```
+
+Vi kan anta att detta stämmer övers med unika individer i person datas
+
+## Test
+
+Vi kan testa detta antagande
+
+```{r}
+library(testthat)
+n_person <- nrow(person) -1 
+expect_equal(n_obs, n_person)
+
+```
+
+## group by och summarise
+
+```{r}
+mothers <- obs %>% 
+  select(mid, id) %>% 
+  group_by(mid) %>% # gruppera efter moder
+  summarise(
+    barn = unique(id)  %>% length() # antalet unika individer per mor = barn
+  )
+```
+
+Dubbel kolla resultatet manuellt 
+
+```{r}
+obs %>% filter(mid == 95) %>% 
+  select(id, mid) %>% 
+  group_by(mid) %>% # gruppera efter moder
+  summarise(
+    barn = unique(id)  %>% length() # antalet unika individer per mor = barn
+  )
+```
+
+Kontrollera visuellt
+
+```{r}
+ggplot(mothers, aes(barn)) + geom_histogram()
+
+range(mothers$barn)
+```
+
+```{r}
+mothers %>% filter(barn > 30)
+```
+
+Resultat är att vi har barn utan kända mödrar (mid == NA)
+
+```{r}
+
+mothers <- obs %>% 
+  filter(!is.na(mid)) %>% 
+  select(mid, id) %>% 
+  group_by(mid) %>% # gruppera efter moder
+  summarise(
+    barn = unique(id)  %>% length() # antalet unika individer per mor = barn
+  )
+```
+
+
+
+```{r}
+ggplot(mothers, aes(barn)) + geom_histogram()
+
+range(mothers$barn)
+```
+
+Finns det ett mönster i bland de barn som inte hade något mid?
+
+Plocka ut alla barn dör mid == NA
+
+```{r}
+no_mother <- obs %>% 
+  filter(is.na(mid)) %>% 
+  select(birthdate, id) %>% 
+  distinct() %>% 
+  mutate(mother = FALSE)
+
+have_a_mother <- obs %>% 
+  filter(!is.na(mid)) %>% 
+  select(birthdate, id) %>% 
+  distinct() %>% 
+  mutate(mother = TRUE)
+```
+
+Kombinera datat
+
+```{r}
+d <- rbind(no_mother, have_a_mother)
+```
+
+Inspikera visuelt
+
+```{r}
+ggplot(d, aes(birthdate, fill = mother)) + geom_histogram() + facet_grid(mother~.)
+```
+
+
+## Join
+
+## Uppgift
+
+1. änka änkling och livslängd?
+1. vilket data?
+2. vilka variabler

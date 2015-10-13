@@ -1,0 +1,56 @@
+---
+title: "tidyr_tutorial"
+author: "Johan Junkka"
+date: "October 5, 2015"
+output: html_document
+---
+
+# Tidyr
+
+```{r}
+library(tidyr)
+library(dplyr)
+```
+
+Lite "skitigt" data
+
+```{r}
+library(RCurl)
+url <- "https://raw.githubusercontent.com/junkka/swepophist/master/data-raw/data/county_pop.csv"
+if (!file.exists("data/raw.rda")){
+  temporaryFile <- tempfile()
+  download.file(url,destfile=temporaryFile, method="curl")
+  raw <- read.csv(temporaryFile, stringsAsFactors = FALSE)
+  save(raw, file = "data/raw.rda")
+} else {
+  load("data/raw.rda")
+}
+```
+
+
+## Make data.table 
+
+```{r}
+raw <- tbl_df(raw)
+```
+
+
+Målet är ett data med 4 variabler
+
+* Context 
+* name 
+* year
+* population
+
+
+```{r}
+library(stringr)
+library(ggplot2)
+raw %>% 
+  gather(year, population, X1749:X2010) %>% 
+  mutate(
+    year = str_extract(year, "[0-9]{4}$")
+  ) %>% 
+  ggplot(aes(year, population)) + geom_line()
+```
+
